@@ -2,13 +2,48 @@
 <html>
 <head>
   <title>Your Extension</title>
+  <style>
+    body {
+      background-color: #2e2e2e;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 20px;
+    }
+    button, textarea {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    textarea {
+      height: 100px; /* Or whatever height you find suitable */
+      width: 220px;
+      resize: none; /* Disables user resizing */
+    }
+    button {
+      background-color: #3a3a3a;
+      color: #fff;
+      border: none;
+    }
+    button:hover {
+      background-color: #4a4a4a;
+    }
+    #bookmarkletContainer {
+      border-top: 1px solid #555;
+      margin-top: 20px;
+      padding-top: 20px;
+    }
+  </style>
   <script src="popup.js"></script>
 </head>
 <body>
-  <input type="text" id="userInput" placeholder="Enter your command">
-  <button id="execute">Execute</button>
+  <textarea id="userInput" placeholder="Enter your command"></textarea>
+  <button id="generate">Generate</button>
   <div id="commandDisplayArea"></div>
-  <button id="runCommand" disabled>Run Command</button>
+  <div id="bookmarkletContainer" style="display:none;">
+    <p id="dragText" style="display:none;">Drag this to your bookmarks bar:</p>
+    <a id="bookmarkletLink" href="#" style="display:none;">Turn Wrench</a>
+  </div>
 </body>
-<iframe src="sandbox.html" id="sandbox" style="display: none"></iframe>
 </html>

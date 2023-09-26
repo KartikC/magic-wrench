@@ -1,17 +1,10 @@
 let jsCodeToExecute = null;
 
-const iframe = document.getElementById('sandbox');
-window.addEventListener('message', function(event) {
-  console.log('Eval output:', event.data);
-});
-
 document.addEventListener("DOMContentLoaded", function () {
-  const executeButton = document.getElementById("execute");
-  const runCommandButton = document.getElementById("runCommand");
+  const generateButton = document.getElementById("generate");
   const commandDisplayArea = document.getElementById("commandDisplayArea");
   
-  executeButton.addEventListener("click", fetchData);
-  runCommandButton.addEventListener("click", executeCode);
+  generateButton.addEventListener("click", fetchData);
 
   async function fetchData() {
     const userInput = document.getElementById("userInput").value;
@@ -42,11 +35,11 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(jsCodeToExecute); //extracted command
         
         if (jsCodeToExecute) {
-          commandDisplayArea.textContent = `Received Command: ${jsCodeToExecute}`;
-          runCommandButton.removeAttribute("disabled");
+          // Fetch the bookmarklet name dynamically
+          const bookmarkletName = await fetchBookmarkletName(jsCodeToExecute);
+          updateUI(bookmarkletName);
         } else {
           commandDisplayArea.textContent = "No executable command received.";
-          runCommandButton.setAttribute("disabled", "disabled");
         }
         
       } else {
@@ -59,28 +52,114 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// function executeCode() {
+//   console.log(`trying to execute: ${jsCodeToExecute}`);
+//   if (jsCodeToExecute) {
+//     // Execute the script in the active tab
+//     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//       const tab = tabs[0];
+//       if (tab && tab.id) {
+//         chrome.scripting.executeScript({
+//           target: {tabId: tab.id},
+//           function: new Function(jsCodeToExecute)
+//         }).then((result) => {
+//           console.log("Script executed successfully:", result);
+//         }).catch((error) => {
+//           console.error("Failed to execute script:", error);
+//         });
+//       } else {
+//         console.error("No active tab found");
+//       }
+//     });
+//   } else {
+//     console.error("No JS code to execute");
+//   }
+// }
+
+// function executeCode() {
+//   console.log(`trying to execute: ${jsCodeToExecute}`);
+//   if (jsCodeToExecute) {
+//     // Execute the script in the active tab
+//     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//       const tab = tabs[0];
+//       if (tab && tab.id) {
+//         chrome.scripting.executeScript({
+//           target: {tabId: tab.id},
+//           function: injectScript,
+//           args: [jsCodeToExecute]
+//         }).then((result) => {
+//           console.log("Script injected successfully:", result);
+//         }).catch((error) => {
+//           console.error("Failed to inject script:", error);
+//         });
+//       } else {
+//         console.error("No active tab found");
+//       }
+//     });
+//   } else {
+//     console.error("No JS code to execute");
+//   }
+// }
+
 function executeCode() {
+  // Assume `jsCodeToExecute` contains the arbitrary JS code.
   console.log(`trying to execute: ${jsCodeToExecute}`);
   if (jsCodeToExecute) {
-    // Execute the script in the active tab
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      const tab = tabs[0];
-      if (tab && tab.id) {
-        chrome.scripting.executeScript({
-          target: {tabId: tab.id},
-          function: new Function(jsCodeToExecute)
-        }).then((result) => {
-          console.log("Script executed successfully:", result);
-        }).catch((error) => {
-          console.error("Failed to execute script:", error);
-        });
-      } else {
-        console.error("No active tab found");
-      }
+      let activeTab = tabs[0];
+      chrome.tabs.sendMessage(activeTab.id, {action: "executeArbitraryCode", code: jsCodeToExecute});
     });
   } else {
     console.error("No JS code to execute");
   }
+}
+
+
+// A function to inject a script tag with JavaScript code into the DOM.
+// This will be injected into the tab.
+// function injectScript(codeToInject) {
+//   const scriptElement = document.createElement('script');
+//   scriptElement.textContent = codeToInject;
+//   (document.head || document.documentElement).appendChild(scriptElement);
+//   scriptElement.remove();
+// }
+
+async function fetchBookmarkletName(code) {
+  try {
+    const response = await fetch('http://localhost:3000/name-wrench', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        code: code,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.name; // Assuming the API returns { name: 'Some Name' }
+    } else {
+      return "Unnamed";
+    }
+  } catch (error) {
+    console.error('Failed to fetch bookmarklet name:', error);
+    return "Unnamed";
+  }
+}
+
+function updateUI(bookmarkletName) {
+  const commandDisplayArea = document.getElementById("commandDisplayArea");
+  commandDisplayArea.textContent = `Received Command: ${jsCodeToExecute}`;
+
+  const bookmarkletCode = `javascript:${encodeURI(jsCodeToExecute)}`;
+  document.getElementById('bookmarkletLink').href = bookmarkletCode;
+  
+  // Update bookmarklet display
+  document.getElementById('bookmarkletLink').textContent = bookmarkletName;
+  document.getElementById('bookmarkletContainer').style.display = "block";
+  document.getElementById('dragText').style.display = "block";
+  document.getElementById('bookmarkletLink').style.display = "block";
 }
 
 
@@ -91,7 +170,9 @@ function extractJSCodeFromPrompt(prompt) {
   const match = prompt.match(codeRegex);
 
   if (match && match[1]) {
-    return match[1].trim();
+    // Wrapping the extracted code in an IIFE
+    const wrappedCode = `(function() { ${match[1].trim()} })();`;
+    return wrappedCode;
   } else {
     return null;
   }

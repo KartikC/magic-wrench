@@ -5,11 +5,12 @@
   "description": "Use GPT-4 to manipulate the DOM",
   "permissions": ["tabs", "activeTab", "scripting"],
   "host_permissions": ["<all_urls>"],
-  "sandbox": {
-    "pages": [
-      "sandbox.html"
-    ]
-  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
   "background": {
     "service_worker": "background.js"
   },
