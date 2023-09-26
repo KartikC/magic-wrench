@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Magic Wrench",
+  "name": "Magic Wrench Factory",
   "version": "0.1",
-  "description": "Use GPT-4 to manipulate the DOM",
+  "description": "Use OpenAI to create wrenches (bookmarklets) that can modify any website!",
   "permissions": ["tabs", "activeTab", "scripting"],
   "host_permissions": ["<all_urls>"],
   "content_scripts": [
