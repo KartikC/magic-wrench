@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Magic Wrench",
+  "version": "0.1",
+  "description": "Use GPT-4 to manipulate the DOM",
+  "permissions": ["tabs", "activeTab", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "sandbox": {
+    "pages": [
+      "sandbox.html"
+    ]
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
