@@ -20,7 +20,8 @@ app.post('/process-input', async (req, res) => {
 
   const userInput = req.body.userInput;
   const domInfo = req.body.domInfo; // Capture the DOM info
-  const prompt = `Translate the following user command into JavaScript code, considering the DOM info: ${userInput}. DOM info: ${JSON.stringify(domInfo)} start the code block with \`\`\`javascript and end it with \`\`\``;
+  // const prompt = `Translate the following user command into JavaScript code, considering the DOM info: ${userInput}. DOM info: ${JSON.stringify(domInfo)} start the code block with \`\`\`javascript and end it with \`\`\``;
+  const prompt = `Translate the following user command into JavaScript code that could be executed on an existing website: ${userInput}. Consider the following DOM info: ${JSON.stringify(domInfo)}. Start the code block with \`\`\`javascript and end it with \`\`\``;
   console.log(prompt);
 
   try {

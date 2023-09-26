@@ -6,25 +6,30 @@
     body {
       background-color: #2e2e2e;
       color: #fff;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: 'Arial', sans-serif;
       padding: 20px;
+      width: 250px;
+      margin: auto;
     }
     button, textarea {
       display: block;
       margin: 10px 0;
       padding: 10px;
-      width: 100%;
+      border-radius: 5px;
       box-sizing: border-box;
+      width: 100%;
     }
     textarea {
       height: 100px; /* Or whatever height you find suitable */
-      width: 220px;
       resize: none; /* Disables user resizing */
+      background-color: #3a3a3a;
+      color: #fff;
+      border: 1px solid #555;
     }
     button {
       background-color: #3a3a3a;
       color: #fff;
-      border: none;
+      border: 1px solid #555;
     }
     button:hover {
       background-color: #4a4a4a;
@@ -33,6 +38,12 @@
       border-top: 1px solid #555;
       margin-top: 20px;
       padding-top: 20px;
+    }
+    a {
+      color: #1e90ff; /* Blue link */
+    }
+    a:hover {
+      color: #63a4ff; /* Lighter blue on hover */
     }
   </style>
   <script src="popup.js"></script>

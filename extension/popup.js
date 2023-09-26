@@ -9,10 +9,13 @@ document.addEventListener("DOMContentLoaded", function () {
   async function fetchData() {
     const userInput = document.getElementById("userInput").value;
 
-    const domInfo = {
-      numberOfButtons: document.querySelectorAll('button').length,
-      numberOfImages: document.querySelectorAll('img').length,
-    };
+    let domInfo = null;
+
+    try {
+      domInfo = await captureDomInfoFromActiveTab();
+    } catch (error) {
+      console.error("An error occurred while getting DOM info:", error);
+    }
 
     console.log(domInfo);
 
@@ -178,3 +181,43 @@ function extractJSCodeFromPrompt(prompt) {
   }
 }
 
+// Function to capture DOM info asynchronously from the active tab
+async function captureDomInfoFromActiveTab() {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      const tab = tabs[0];
+      if (tab && tab.id) {
+        chrome.scripting.executeScript({
+          target: {tabId: tab.id},
+          function: function captureDOMInfo() {
+            const selectors = [
+              'button', 'a', 'input', 'textarea', 'select',
+              'img'
+            ];
+
+            const domInfo = {};
+
+            selectors.forEach(selector => {
+              const elements = Array.from(document.querySelectorAll(selector));
+              if (elements.length > 0) {
+                domInfo[selector] = elements.map((element, index) => {
+                  return {
+                    id: element.id,
+                    className: element.className
+                  };
+                });
+              }
+            });
+
+            return domInfo;
+          }
+        }, (injectionResults) => {
+          const domInfo = (injectionResults && injectionResults.length > 0) ? injectionResults[0].result : null;
+          resolve(domInfo);
+        });
+      } else {
+        reject("No active tab found");
+      }
+    });
+  });
+}
