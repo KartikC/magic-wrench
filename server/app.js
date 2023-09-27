@@ -8,9 +8,13 @@ const openai = new OpenAI({
 });
 
 // Enable CORS for your Chrome Extension's ID
-app.use(cors({
-  origin: 'chrome-extension://bkjjfddbgghljdmlhplohmdndhflmmno'
-}));
+// app.use(cors({
+//   origin: 'chrome-extension://bkjjfddbgghljdmlhplohmdndhflmmno'
+// }));
+
+// Enable CORS for all domains
+app.use(cors());
+
 
 app.use(express.json());
 
