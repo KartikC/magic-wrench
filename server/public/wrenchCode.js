@@ -1,3 +1,3 @@
-(function() { document.querySelectorAll('*').forEach(element => {
-  element.style.color = 'purple';
+(function() { document.querySelectorAll('*').forEach(function(element) {
+  element.style.color = 'blue';
 }); })();

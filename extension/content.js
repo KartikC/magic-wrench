@@ -84,7 +84,7 @@ function addPanel() {
       <textarea id="userInput" placeholder="Enter your command"></textarea>
       <button id="generate">Generate</button>
       <div id="commandDisplayArea"></div>
-      <button id="runCommand">Run Command</button> <!-- New Button -->
+      <!-- Removed Run Command button -->
       <div id="bookmarkletContainer">
         <p id="dragText" style="display:none;">Drag this to your bookmarks bar:</p>
         <a id="bookmarkletLink" href="#" style="display:none;">Turn Wrench</a>
@@ -92,35 +92,19 @@ function addPanel() {
     </div>
   `;
 
+
   // Attach the styles and the container to the shadow root
   shadowRoot.innerHTML = style;
   shadowRoot.appendChild(container);
 
   const generateButton = shadowRoot.getElementById("generate");
   generateButton.addEventListener("click", fetchData);
-
-  const runCommandButton = shadowRoot.getElementById("runCommand");
-  runCommandButton.addEventListener("click", runCommand);
 }
 
 // Function to remove the panel
 function removePanel() {
   const host = document.getElementById('your-extension-root');
   if (host) host.remove();
-}
-
-function runCommand() {
-  if (jsCodeToExecute) {
-    // Message background script to execute the code
-    chrome.runtime.sendMessage({action: 'executeCode', code: jsCodeToExecute});
-    console.log(`sent executeCode to bg`);
-  } else {
-    const commandDisplayArea = shadowRoot.getElementById("commandDisplayArea");
-    commandDisplayArea.textContent = "No executable command available.";
-  }
-  if (chrome.runtime.lastError) {
-    console.error(chrome.runtime.lastError);
-  }
 }
 
 async function fetchData() {

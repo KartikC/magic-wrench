@@ -24,8 +24,9 @@ const openai = new OpenAI({
 // Enable CORS for all domains
 app.use(cors());
 
-
 app.use(express.json());
+
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.post('/process-input', async (req, res) => {
   const MODEL = "gpt-3.5-turbo-16k";
