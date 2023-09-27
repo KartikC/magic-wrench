@@ -190,24 +190,43 @@ async function captureDomInfoFromActiveTab() {
         chrome.scripting.executeScript({
           target: {tabId: tab.id},
           function: function captureDOMInfo() {
+            const TOKEN_LIMIT = 15000;  // Set your token limit here
+            let currentTokenCount = 0;
+
             const selectors = [
               'button', 'a', 'input', 'textarea', 'select',
-              'img'
+              'div'
             ];
 
             const domInfo = {};
 
-            selectors.forEach(selector => {
+            for (const selector of selectors) {
+              if (currentTokenCount >= TOKEN_LIMIT) {
+                break;
+              }
+
               const elements = Array.from(document.querySelectorAll(selector));
               if (elements.length > 0) {
-                domInfo[selector] = elements.map((element, index) => {
-                  return {
+                domInfo[selector] = [];
+
+                for (const [index, element] of elements.entries()) {
+                  if (currentTokenCount >= TOKEN_LIMIT) {
+                    break;
+                  }
+
+                  const elementInfo = {
                     id: element.id,
                     className: element.className
                   };
-                });
+
+                  domInfo[selector].push(elementInfo);
+
+                  // Update currentTokenCount based on some logic
+                  // For simplicity, each element contributes a fixed number of tokens
+                  currentTokenCount += 70;
+                }
               }
-            });
+            }
 
             return domInfo;
           }

@@ -15,13 +15,13 @@ app.use(cors({
 app.use(express.json());
 
 app.post('/process-input', async (req, res) => {
-  const MODEL = "gpt-3.5-turbo";
+  const MODEL = "gpt-3.5-turbo-16k";
   //const MODEL = "gpt-4";
 
   const userInput = req.body.userInput;
   const domInfo = req.body.domInfo; // Capture the DOM info
   // const prompt = `Translate the following user command into JavaScript code, considering the DOM info: ${userInput}. DOM info: ${JSON.stringify(domInfo)} start the code block with \`\`\`javascript and end it with \`\`\``;
-  const prompt = `Translate the following user command into JavaScript code that could be executed on an existing website: ${userInput}. Consider the following DOM info: ${JSON.stringify(domInfo)}. Start the code block with \`\`\`javascript and end it with \`\`\``;
+  const prompt = `Understand what the user wants and translate the following user command into JavaScript code that could be executed on an existing website: ${userInput}. Consider the following DOM info: ${JSON.stringify(domInfo)}. Start the code block with \`\`\`javascript and end it with \`\`\``;
   console.log(prompt);
 
   try {
