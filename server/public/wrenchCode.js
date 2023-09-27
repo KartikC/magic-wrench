@@ -1,14 +1,19 @@
-(function() { // Select all feed items
-const feedItems = document.querySelectorAll('.feed-shared-update-v2');
+(function() { // Get all image elements on the page
+const images = document.getElementsByTagName('img');
 
-// Iterate over each item and apply styles
-feedItems.forEach(item => {
-  // Make the item smaller
-  item.style.transform = 'scale(0.8)';
-  
-  // Make all text neon
-  const textElements = item.querySelectorAll('*');
-  textElements.forEach(element => {
-    element.style.textShadow = '0 0 5px #ff00ff';
+// Attach click event listener to each image
+Array.from(images).forEach(image => {
+  image.addEventListener('click', () => {
+    // Create a new anchor element
+    const link = document.createElement('a');
+    
+    // Set the download attribute to force download
+    link.setAttribute('download', 'image');
+    
+    // Set the href attribute to the image source
+    link.setAttribute('href', image.src);
+    
+    // Trigger the download
+    link.click();
   });
 }); })();
