@@ -33,7 +33,7 @@ function addPanel() {
       background-color: #2e2e2e;
       color: #fff;
       font-family: 'Arial', sans-serif;
-      padding: 10px;
+      padding: 20px;
       width: 250px;
       position: fixed;
       top: 0;
@@ -99,7 +99,7 @@ function addPanel() {
       <div id="bookmarkletContainer" style="display:none;">
         <p>Click the link below to apply your changes:</p>
         <a id="bookmarkletLink" href="#">Turn Wrench</a>
-        <p>If it didn't work, simply drag the link to your bookmarks and click it there. This is due to browser restrictions on injecting arbitrary code.</p>
+        <p><b>If it didn't work</b>, simply drag the link to your bookmarks and click it there. This is due to browser restrictions on injecting arbitrary code.</p>
       </div>
     </div>
   `;

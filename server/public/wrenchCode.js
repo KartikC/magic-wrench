@@ -1,12 +1,14 @@
-(function() { // Removing user info from feed items
+(function() { // Select all feed items
 const feedItems = document.querySelectorAll('.feed-shared-update-v2');
-feedItems.forEach(item => {
-  const actorContainer = item.querySelector('.update-components-actor');
-  actorContainer.remove();
-});
 
-// Making content larger
-const content = document.querySelectorAll('.update-components-update-v2__commentary, .update-components-article__title');
-content.forEach(item => {
-  item.classList.add('t-16', 't-black', 't-bold');
+// Iterate over each item and apply styles
+feedItems.forEach(item => {
+  // Make the item smaller
+  item.style.transform = 'scale(0.8)';
+  
+  // Make all text neon
+  const textElements = item.querySelectorAll('*');
+  textElements.forEach(element => {
+    element.style.textShadow = '0 0 5px #ff00ff';
+  });
 }); })();

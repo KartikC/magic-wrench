@@ -35,7 +35,7 @@ app.post('/process-input', async (req, res) => {
   const userInput = req.body.userInput;
   const domInfo = truncateJsonByTokens(req.body.domInfo, 16000); // Capture the DOM info
   // const prompt = `Translate the following user command into JavaScript code, considering the DOM info: ${userInput}. DOM info: ${JSON.stringify(domInfo)} start the code block with \`\`\`javascript and end it with \`\`\``;
-  const prompt = `Understand what the user wants and translate the following user command into JavaScript code that could be executed on an existing website: ${userInput}. Consider the following DOM info: ${domInfo.truncatedText}. Start the code block with \`\`\`javascript and end it with \`\`\``;
+  const prompt = `Understand what the user wants and translate the following user command into JavaScript code that could be executed on an existing website: ${userInput}. Consider the following DOM info: ${domInfo.truncatedText}. Always apply important tags and use other methods to make sure your code is applied despite code that is already on the website we're modifying. Start the code block with \`\`\`javascript and end it with \`\`\``;
   
   console.log(prompt);
   console.log(`Had to truncate prompt? ${domInfo.didTruncate}`);
