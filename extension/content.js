@@ -26,33 +26,101 @@ function addPanel() {
   // Set the shadow root
   shadowRoot = host.attachShadow({mode: 'closed'});
 
+  // Styles for the shadow root, targeting specific classes or IDs
+  const style = `
+  <style>
+    .container {
+      background-color: #2e2e2e;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      padding: 20px;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 9999;
+    }
+    .container button, .container textarea {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .container textarea {
+      height: 100px;
+      resize: none;
+      background-color: #3a3a3a;
+      color: #fff;
+      border: 1px solid #555;
+    }
+    .container button {
+      background-color: #3a3a3a;
+      color: #fff;
+      border: 1px solid #555;
+    }
+    .container button:hover {
+      background-color: #4a4a4a;
+    }
+    #bookmarkletContainer {
+      border-top: 1px solid #555;
+      margin-top: 20px;
+      padding-top: 20px;
+    }
+    a {
+      color: #1e90ff;
+    }
+    a:hover {
+      color: #63a4ff;
+    }
+  </style>
+`;
+
   // Create a container for your popup content
   const container = document.createElement('div');
   container.innerHTML = `
-    <div style="position: fixed; top: 0; right: 0; z-index: 9999; width: 250px; background-color: #2e2e2e; color: #fff; padding: 20px;">
-      <textarea id="userInput" placeholder="Enter your command" style="display: block; margin: 10px 0; padding: 10px; border-radius: 5px; box-sizing: border-box; width: 100%; height: 100px; resize: none; background-color: #3a3a3a; color: #fff; border: 1px solid #555;"></textarea>
-      <button id="generate" style="display: block; margin: 10px 0; padding: 10px; border-radius: 5px; box-sizing: border-box; width: 100%; background-color: #3a3a3a; color: #fff; border: 1px solid #555;">Generate</button>
+    <div class="container">
+      <textarea id="userInput" placeholder="Enter your command"></textarea>
+      <button id="generate">Generate</button>
       <div id="commandDisplayArea"></div>
-      <div id="bookmarkletContainer" style="display:none; border-top: 1px solid #555; margin-top: 20px; padding-top: 20px;">
+      <button id="runCommand">Run Command</button> <!-- New Button -->
+      <div id="bookmarkletContainer">
         <p id="dragText" style="display:none;">Drag this to your bookmarks bar:</p>
-        <a id="bookmarkletLink" href="#" style="display:none; color: #1e90ff;">Turn Wrench</a>
+        <a id="bookmarkletLink" href="#" style="display:none;">Turn Wrench</a>
       </div>
     </div>
   `;
-  // Attach the container to the shadow root
-  shadowRoot.appendChild(container);
 
-  // The rest of your JavaScript logic can be added here, adapted from popup.js
-  // ...previous content script code...
+  // Attach the styles and the container to the shadow root
+  shadowRoot.innerHTML = style;
+  shadowRoot.appendChild(container);
 
   const generateButton = shadowRoot.getElementById("generate");
   generateButton.addEventListener("click", fetchData);
+
+  const runCommandButton = shadowRoot.getElementById("runCommand");
+  runCommandButton.addEventListener("click", runCommand);
 }
 
 // Function to remove the panel
 function removePanel() {
   const host = document.getElementById('your-extension-root');
   if (host) host.remove();
+}
+
+function runCommand() {
+  if (jsCodeToExecute) {
+    // Message background script to execute the code
+    chrome.runtime.sendMessage({action: 'executeCode', code: jsCodeToExecute});
+    console.log(`sent executeCode to bg`);
+  } else {
+    const commandDisplayArea = shadowRoot.getElementById("commandDisplayArea");
+    commandDisplayArea.textContent = "No executable command available.";
+  }
+  if (chrome.runtime.lastError) {
+    console.error(chrome.runtime.lastError);
+  }
 }
 
 async function fetchData() {
@@ -76,9 +144,9 @@ async function fetchData() {
 
     if (response.ok) {
       const data = await response.json();
-      jsCodeToExecute = extractJSCodeFromPrompt(data.command);
       
-      if (jsCodeToExecute) {
+      if (data.command) {
+        jsCodeToExecute = data.command;
         // Assuming you have a function fetchBookmarkletName() similar to what you had in popup.js
         const bookmarkletName = await fetchBookmarkletName(jsCodeToExecute);
         updateUI(bookmarkletName, jsCodeToExecute);
@@ -99,20 +167,6 @@ function captureDOMInfo() {
   // Your logic here...
   // Since we're in the content script, you can access the DOM directly.
   return {};
-}
-
-function extractJSCodeFromPrompt(prompt) {
-  // Regular expression to extract JavaScript code enclosed in triple backticks ```javascript ... ```
-  const codeRegex = /```javascript([\s\S]*?)```/i;
-  const match = prompt.match(codeRegex);
-
-  if (match && match[1]) {
-    // Wrapping the extracted code in an IIFE
-    const wrappedCode = `(function() { ${match[1].trim()} })();`;
-    return wrappedCode;
-  } else {
-    return null;
-  }
 }
 
 async function fetchBookmarkletName(code) {
