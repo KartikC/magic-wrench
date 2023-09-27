@@ -64,15 +64,24 @@ function addPanel() {
       background-color: #4a4a4a;
     }
     #bookmarkletContainer {
-      border-top: 1px solid #555;
-      margin-top: 20px;
-      padding-top: 20px;
+      margin-top: 10px;
+      padding-top: 10px;
     }
     a {
       color: #1e90ff;
     }
     a:hover {
       color: #63a4ff;
+    }
+    #commandDisplayArea {
+      white-space: pre-wrap !important;  /* Allows text to wrap */
+      font-family: 'Courier New', monospace !important; /* Monospace font */
+      font-size: 12px;  /* Smaller font size */
+      word-break: break-all;  /* To prevent overflow */
+      overflow-wrap: break-word;  /* Allows text to wrap onto the next line */
+      max-width: 100%;  /* Maximum width */
+      border: 1px solid #555;  /* Optional: for visual distinction */
+      padding: 10px;  /* Optional: for padding */
     }
   </style>
 `;
@@ -81,13 +90,16 @@ function addPanel() {
   const container = document.createElement('div');
   container.innerHTML = `
     <div class="container">
-      <textarea id="userInput" placeholder="Enter your command"></textarea>
-      <button id="generate">Generate</button>
-      <div id="commandDisplayArea"></div>
-      <!-- Removed Run Command button -->
-      <div id="bookmarkletContainer">
-        <p id="dragText" style="display:none;">Drag this to your bookmarks bar:</p>
-        <a id="bookmarkletLink" href="#" style="display:none;">Turn Wrench</a>
+      <textarea id="userInput" placeholder="Describe what you want to change on this site and then click the button to make it happen!"></textarea>
+      <button id="generate">Generate Command</button>
+      <div id="commandContainer" style="display:none;">
+        <p>Received Command: </p>
+        <div id="commandDisplayArea">
+      </div>
+      <div id="bookmarkletContainer" style="display:none;">
+        <p>Click the link below to apply your changes:</p>
+        <a id="bookmarkletLink" href="#">Turn Wrench</a>
+        <p>If it didn't work, simply drag the link to your bookmarks and click it there. This is due to browser restrictions on injecting arbitrary code.</p>
       </div>
     </div>
   `;
@@ -179,7 +191,7 @@ async function fetchBookmarkletName(code) {
 
 function updateUI(bookmarkletName, jsCodeToExecute) {
   const commandDisplayArea = shadowRoot.getElementById("commandDisplayArea");
-  commandDisplayArea.textContent = `Received Command: ${jsCodeToExecute}`;
+  commandDisplayArea.textContent = `${jsCodeToExecute}`;
 
   const bookmarkletCode = `javascript:${encodeURI(jsCodeToExecute)}`;
   shadowRoot.getElementById('bookmarkletLink').href = bookmarkletCode;
@@ -187,6 +199,5 @@ function updateUI(bookmarkletName, jsCodeToExecute) {
   // Update bookmarklet display
   shadowRoot.getElementById('bookmarkletLink').textContent = bookmarkletName;
   shadowRoot.getElementById('bookmarkletContainer').style.display = "block";
-  shadowRoot.getElementById('dragText').style.display = "block";
-  shadowRoot.getElementById('bookmarkletLink').style.display = "block";
+  shadowRoot.getElementById('commandContainer').style.display = "block";
 }
