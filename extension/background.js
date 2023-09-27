@@ -13,3 +13,22 @@ chrome.action.onClicked.addListener((tab) => {
     chrome.tabs.sendMessage(tab.id, {action: 'enable'});
   }
 });
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'executeCode') {
+        // Find the active tab to execute the script in
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            const tab = tabs[0];
+            chrome.scripting.executeScript({
+                target: {tabId: tab.id},
+                code: request.code
+            }, (result) => {
+                if (chrome.runtime.lastError) {
+                    console.error(chrome.runtime.lastError);
+                }
+            });
+        });
+    }
+    // ... handle other actions
+  });
+  

@@ -1,6 +1,15 @@
 import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ...rest of your code
+
 
 const app = express();
 const openai = new OpenAI({
@@ -39,8 +48,21 @@ app.post('/process-input', async (req, res) => {
       ],
     });
 
+    const extractedCode = extractJSCodeFromResult(response.choices[0].message.content.trim()); //null if no code
+
+    if (extractedCode) {
+      // Save the extracted code to a file
+      const filePath = path.join(__dirname, 'public', 'wrenchCode.js');
+      fs.writeFile(filePath, extractedCode, (err) => {
+        if (err) {
+          console.error("File write failed:", err);
+          return res.status(500).json({error: 'Internal Server Error'});
+        }
+      });
+    }
+
     res.json({
-      command: response.choices[0].message.content.trim(),
+      command: extractedCode,
     });
   } catch (err) {
     console.error("OpenAI API call failed: ", err);
@@ -80,3 +102,18 @@ const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+// Function to extract JavaScript code from the result
+function extractJSCodeFromResult(result) {
+  // Regular expression to extract JavaScript code enclosed in triple backticks ```javascript ... ```
+  const codeRegex = /```javascript([\s\S]*?)```/i;
+  const match = result.match(codeRegex);
+
+  if (match && match[1]) {
+    // Wrapping the extracted code in an IIFE
+    const wrappedCode = `(function() { ${match[1].trim()} })();`;
+    return wrappedCode;
+  } else {
+    return null;
+  }
+}
