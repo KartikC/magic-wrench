@@ -33,7 +33,7 @@ function addPanel() {
       background-color: #2e2e2e;
       color: #fff;
       font-family: 'Arial', sans-serif;
-      padding: 20px;
+      padding: 10px;
       width: 250px;
       position: fixed;
       top: 0;
@@ -76,7 +76,7 @@ function addPanel() {
     #commandDisplayArea {
       white-space: pre-wrap !important;  /* Allows text to wrap */
       font-family: 'Courier New', monospace !important; /* Monospace font */
-      font-size: 12px;  /* Smaller font size */
+      font-size: 10px;  /* Smaller font size */
       word-break: break-all;  /* To prevent overflow */
       overflow-wrap: break-word;  /* Allows text to wrap onto the next line */
       max-width: 100%;  /* Maximum width */
@@ -109,6 +109,21 @@ function addPanel() {
   shadowRoot.innerHTML = style;
   shadowRoot.appendChild(container);
 
+  // Get the textarea element
+  const userInput = shadowRoot.getElementById("userInput");
+
+  // Listen for focus event on the textarea
+  userInput.addEventListener("focus", function(event) {
+    // Capture all keydown events when textarea is focused
+    window.addEventListener("keydown", captureKeys);
+  });
+
+  // Listen for blur event on the textarea
+  userInput.addEventListener("blur", function(event) {
+    // Remove the keydown event listener when textarea loses focus
+    window.removeEventListener("keydown", captureKeys);
+  });
+
   const generateButton = shadowRoot.getElementById("generate");
   generateButton.addEventListener("click", fetchData);
 }
@@ -119,12 +134,15 @@ function removePanel() {
   if (host) host.remove();
 }
 
+// Function to capture key events
+function captureKeys(event) {
+  // Stop the event from bubbling up and being captured by other elements
+  event.stopPropagation();
+}
+
 async function fetchData() {
   const userInput = shadowRoot.getElementById("userInput").value;
   const commandDisplayArea = shadowRoot.getElementById("commandDisplayArea");
-
-  // Assuming you have a function captureDomInfoFromActiveTab() similar to what you had in popup.js
-  const domInfo = captureDOMInfo();
 
   try {
     const response = await fetch('http://localhost:3000/process-input', {
@@ -134,7 +152,7 @@ async function fetchData() {
       },
       body: JSON.stringify({
         userInput: userInput,
-        domInfo: domInfo,
+        domInfo: captureDOMInfo(),
       }),
     });
 
@@ -160,10 +178,42 @@ async function fetchData() {
 }
 
 function captureDOMInfo() {
-  // Your logic here...
-  // Since we're in the content script, you can access the DOM directly.
-  return {};
+  const domInfo = {};
+
+  // Current URL
+  //domInfo.currentUrl = window.location.href;
+
+  // Page Title
+  domInfo.pageTitle = document.title;
+
+  // IDs and Classes
+  domInfo.ids = Array.from(document.querySelectorAll('[id]')).map(el => el.id);
+  domInfo.classes = Array.from(document.querySelectorAll('[class]')).flatMap(el => Array.from(el.classList));
+
+  // Form Info
+  const forms = document.querySelectorAll('form');
+  domInfo.formNamesOrIds = Array.from(forms).map(form => form.name || form.id);
+
+  // Button and Link Text
+  const buttons = document.querySelectorAll('button');
+  const links = document.querySelectorAll('a');
+  domInfo.buttonTexts = Array.from(buttons).map(button => button.innerText.trim());
+  domInfo.linkTexts = Array.from(links).map(link => link.innerText.trim());
+
+  // Meta Tags
+  //const metaTags = document.querySelectorAll('meta');
+  //domInfo.metaContent = Array.from(metaTags).map(meta => ({name: meta.name, content: meta.content}));
+
+  // Count of Elements by Tag
+  //const tags = ['div', 'span', 'img', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+  //domInfo.elementsByTag = {};
+  //tags.forEach(tag => {
+  //  domInfo.elementsByTag[tag] = document.querySelectorAll(tag).length;
+  //});
+
+  return domInfo;
 }
+
 
 async function fetchBookmarkletName(code) {
   try {

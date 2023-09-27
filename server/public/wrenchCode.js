@@ -1,15 +1,12 @@
-(function() { // Get all images
-const images = document.getElementsByTagName('img');
+(function() { // Removing user info from feed items
+const feedItems = document.querySelectorAll('.feed-shared-update-v2');
+feedItems.forEach(item => {
+  const actorContainer = item.querySelector('.update-components-actor');
+  actorContainer.remove();
+});
 
-// Loop through each image and flip it horizontally
-for (let i = 0; i < images.length; i++) {
-  images[i].style.transform = 'scaleX(-1)';
-}
-
-// Get all elements with text content
-const textElements = document.querySelectorAll('*:not(script):not(link)');
-
-// Loop through each element and make the text color green
-for (let i = 0; i < textElements.length; i++) {
-  textElements[i].style.color = 'green';
-} })();
+// Making content larger
+const content = document.querySelectorAll('.update-components-update-v2__commentary, .update-components-article__title');
+content.forEach(item => {
+  item.classList.add('t-16', 't-black', 't-bold');
+}); })();
