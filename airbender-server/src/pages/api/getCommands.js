@@ -1,10 +1,10 @@
 import Cors from 'cors';
 import { sql } from "@vercel/postgres";
 
-// Initialize CORS middleware
+// Initializing CORS middleware
 const cors = Cors({
-  methods: ['POST'],
-  origin: '*'
+    methods: ['POST'],
+    origin: '*'
 });
 
 // Helper method to run middleware
