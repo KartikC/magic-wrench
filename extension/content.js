@@ -1,5 +1,5 @@
 //CONFIG
-const ENV = "production"; // Change to "production" when deploying
+let currentEnv = "production"; // Change to "production" when deploying
 
 const config = {
   development: {
@@ -10,7 +10,7 @@ const config = {
   }
 };
 
-const API_URL = config[ENV].apiUrl;
+let API_URL = config[currentEnv].apiUrl;
 
 let isEnabled = false; // To keep track of the extension state
 let jsCodeToExecute = null;
@@ -54,6 +54,10 @@ function addPanel() {
       top: 0;
       right: 0;
       z-index: 9999;
+    }
+    #devModeToggle, label[for='devModeToggle'] {
+      font-size: 12px; /* smaller font size */
+      color: #ccc;  /* lighter color */
     }
     .container button, .container textarea {
       display: block;
@@ -110,6 +114,9 @@ function addPanel() {
   const container = document.createElement('div');
   container.innerHTML = `
     <div class="container">
+    <label for="devModeToggle">
+    <input type="checkbox" id="devModeToggle"> Enable Dev Mode
+  </label>
       <textarea id="userInput" placeholder="Describe what you want to change on this site and then click the button to make it happen!"></textarea>
       <button id="generate">Generate Command</button>
       <div id="commandContainer" style="display:none;">
@@ -123,6 +130,7 @@ function addPanel() {
       </div>
     </div>
   `;
+  
 
 
   // Attach the styles and the container to the shadow root
@@ -146,6 +154,16 @@ function addPanel() {
 
   const generateButton = shadowRoot.getElementById("generate");
   generateButton.addEventListener("click", fetchData);
+
+  // New code to update API_URL
+  const devModeToggle = shadowRoot.getElementById("devModeToggle");
+
+  devModeToggle.addEventListener('change', function() {
+    currentEnv = devModeToggle.checked ? "development" : "production";
+    // Update API_URL dynamically
+    API_URL = config[currentEnv].apiUrl;
+  });
+
 }
 
 // Function to remove the panel
