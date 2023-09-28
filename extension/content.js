@@ -83,6 +83,8 @@ async function addPanel() {
     #bookmarkletContainer {
       margin-top: 10px;
       padding-top: 10px;
+      border-top: 1px solid #555;
+      border-bottom: 1px solid #555;
     }
     a {
       color: #1e90ff;
@@ -105,6 +107,70 @@ async function addPanel() {
       padding: 10px;  /* Optional: for padding */
       overflow-y: scroll !important;
     }
+    #loader {
+      border: 2.5px solid #f3f3f3; /* Light grey */
+      border-top: 2.5px solid #3498db; /* Blue */
+      border-radius: 50%;
+      width: 20px;  /* Half the size */
+      height: 20px;  /* Half the size */
+      animation: spin 1s linear infinite;
+      display: none; /* Hidden by default */
+    }    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    #commandNamesListContainer {
+      font-family: 'Arial', sans-serif;
+      font-size: 12px;  /* Smaller font size */
+      word-break: break-all;  /* To prevent overflow */
+      overflow-wrap: break-word;  /* Allows text to wrap onto the next line */
+      max-width: 100%;  /* Maximum width */
+      max-height: 100px;
+      border: 1px solid #555;  /* Optional: for visual distinction */
+      padding: 10px;  /* Optional: for padding */
+      overflow-y: scroll !important;
+    }
+    #commandNamesList {
+      list-style-type: none; /* Removes bullets */
+      margin: 0;
+      padding: 0;
+    }
+    #commandNamesList li {
+      cursor: pointer; /* Makes it look clickable */
+      text-decoration: underline; /* Makes it look like a link */
+      color: #1e90ff;
+    }
+    #importantMsg {
+      color: #EEB9AE;
+    }
+    #bookmarkletLink {
+      display: inline-block;
+      background-color: #1e90ff;
+      color: white;
+      border: 1px solid #1e90ff;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      box-sizing: border-box;
+      width: 100%;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+    #bookmarkletLink:hover {
+      background-color: #007BFF;
+    }
+    #bookmarkletLink:active {
+      background-color: #0056b3;
+    }
+    /* Makes it look draggable */
+    #bookmarkletLink.draggable {
+      cursor: grab;
+    }
+    #bookmarkletLink.dragging {
+      cursor: grabbing;
+    }
   </style>
 `;
 
@@ -119,18 +185,22 @@ async function addPanel() {
         <div id="commandDisplayArea"></div>
       </div>
       <div id="bookmarkletContainer" style="display:none;">
-        <p>Click the link below to apply your changes:</p>
+        <p>Click the button below to apply your changes:</p>
         <a id="bookmarkletLink" href="#">Turn Wrench</a>
-        <p><b>If it didn't work</b>, simply drag the link to your bookmarks and click it there. This is due to browser restrictions on injecting arbitrary code.</p>
+        <p id="importantMsg"><b>If it didn't work</b>, please click & drag the button to your bookmarks bar and click it there.</p>
       </div>
-      <div id="savedCommandsList" style="display:none;">
-        <p>Saved Commands:</p>
-          <ul id="commandNamesList">
-          </ul>
+      <div id="loader" style="display: none;"></div>
+      <div id="savedCommandsList">
+      <p>Community Commands:</p>
+        <div id="commandNamesListContainer" style="display: none;">
+          <ul id="commandNamesList"></ul>
+        </div>
       </div>
+      <div>
       <label for="devModeToggle">
         <input type="checkbox" id="devModeToggle"> Enable Dev Mode
       </label>
+      </div>
     </div>
   `;
   
@@ -167,6 +237,10 @@ async function addPanel() {
     API_URL = config[currentEnv].apiUrl;
   });
 
+  // Show the loader
+  const loader = shadowRoot.getElementById("loader");
+  loader.style.display = "block";
+
   try {
     const savedCommands = await fetchSavedCommands();
     console.log('Saved Commands:', savedCommands); // remove
@@ -178,8 +252,12 @@ async function addPanel() {
       listItem.dataset.code = command.code;  // Store the code in the dataset but don't display it
       commandNamesList.appendChild(listItem);
     });
-    shadowRoot.getElementById("savedCommandsList").style.display = "block";
+    // Hide loader and show list
+    loader.style.display = "none";
+    shadowRoot.getElementById("commandNamesListContainer").style.display = "block";
   } catch (error) {
+    // Hide loader in case of an error
+    loader.style.display = "none";
     console.error("Failed to fetch saved commands:", error);
   }
 
@@ -209,6 +287,10 @@ function captureKeys(event) {
 async function fetchData() {
   const userInput = shadowRoot.getElementById("userInput").value;
   const commandDisplayArea = shadowRoot.getElementById("commandDisplayArea");
+
+  // Show the loader
+  const loader = shadowRoot.getElementById("loader");
+  loader.style.display = "block";
 
   try {
     console.log(`${API_URL}/api/processInput`);
@@ -261,6 +343,9 @@ async function fetchData() {
     console.error('Failed to communicate with the server:', error);
     showErrorPopup(`Failed to communicate with the server: ${error}`);
   }
+
+  //remove loader
+  loader.style.display = "none";
 }
 
 function captureDOMInfo() {
