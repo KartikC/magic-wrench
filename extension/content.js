@@ -18,18 +18,20 @@ let shadowRoot;
 
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'enable') {
-    isEnabled = true;
-    addPanel();
-  } else if (request.action === 'disable') {
-    isEnabled = false;
-    removePanel();
+  if (request.action === 'toggle') {
+    if (isEnabled) {
+      removePanel();
+      sendResponse({status: 'disabled'});
+    } else {
+      addPanel();
+      sendResponse({status: 'enabled'});
+    }
   }
 });
 
 // Function to add the panel
 async function addPanel() {
-  if (!isEnabled) return; // Exit if the extension is disabled
+  //if (!isEnabled) return; // Exit if the extension is disabled
 
   // Create a shadow root host
   const host = document.createElement('div');
@@ -250,10 +252,8 @@ async function addPanel() {
 
   try {
     const savedCommands = await fetchSavedCommands();
-    console.log('Saved Commands:', savedCommands); // remove
     const commandNamesList = shadowRoot.getElementById("commandNamesList");
     savedCommands.forEach(command => {
-      console.log('Individual Command:', command); // remove
       const listItem = document.createElement('li');
       listItem.textContent = command.name;
       listItem.dataset.code = command.code;  // Store the code in the dataset but don't display it
@@ -276,13 +276,15 @@ async function addPanel() {
     }
   });
   
-
+  isEnabled = true;
 }
 
 // Function to remove the panel
 function removePanel() {
   const host = document.getElementById('airbender-root');
   if (host) host.remove();
+
+  isEnabled = false;
 }
 
 // Function to capture key events
