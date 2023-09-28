@@ -1,3 +1,17 @@
+//CONFIG
+const ENV = "development"; // Change to "production" when deploying
+
+const config = {
+  development: {
+    apiUrl: "http://localhost:3000"
+  },
+  production: {
+    apiUrl: "https://airbender-server.vercel.app"
+  }
+};
+
+const API_URL = config[ENV].apiUrl;
+
 let isEnabled = false; // To keep track of the extension state
 let jsCodeToExecute = null;
 let shadowRoot;
@@ -151,7 +165,8 @@ async function fetchData() {
   const commandDisplayArea = shadowRoot.getElementById("commandDisplayArea");
 
   try {
-    const response = await fetch('http://localhost:3000/process-input', {
+    console.log(`${API_URL}/api/processInput`);
+    const response = await fetch(`${API_URL}/api/processInput`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -225,7 +240,7 @@ function captureDOMInfo() {
 
 async function fetchBookmarkletName(code) {
   try {
-    const response = await fetch('http://localhost:3000/name-wrench', {
+    const response = await fetch(`${API_URL}/api/nameWrench`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
