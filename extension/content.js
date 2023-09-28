@@ -28,13 +28,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 // Function to add the panel
-function addPanel() {
+async function addPanel() {
   if (!isEnabled) return; // Exit if the extension is disabled
-
 
   // Create a shadow root host
   const host = document.createElement('div');
-  host.id = 'your-extension-root';
+  host.id = 'airbender-root';
   document.body.appendChild(host);
 
   // Set the shadow root
@@ -128,6 +127,11 @@ function addPanel() {
         <a id="bookmarkletLink" href="#">Turn Wrench</a>
         <p><b>If it didn't work</b>, simply drag the link to your bookmarks and click it there. This is due to browser restrictions on injecting arbitrary code.</p>
       </div>
+      <div id="savedCommandsList" style="display:none;">
+        <p>Saved Commands:</p>
+          <ul id="commandNamesList">
+          </ul>
+      </div>
     </div>
   `;
   
@@ -164,11 +168,34 @@ function addPanel() {
     API_URL = config[currentEnv].apiUrl;
   });
 
+  const commandNamesList = shadowRoot.getElementById("commandNamesList");
+
+  try {
+    const savedCommands = await fetchSavedCommands();
+    savedCommands.forEach(command => {
+      const listItem = document.createElement('li');
+      listItem.textContent = command.name;
+      listItem.dataset.code = command.jsCodeToExecute;  // Store the code in the dataset but don't display it
+      commandNamesList.appendChild(listItem);
+    });
+    shadowRoot.getElementById("savedCommandsList").style.display = "block";
+  } catch (error) {
+    console.error("Failed to fetch saved commands:", error);
+  }
+
+  commandNamesList.addEventListener("click", function(event) {
+    if (event.target.tagName === 'LI') {
+      jsCodeToExecute = event.target.dataset.code;
+      updateUI(event.target.textContent, jsCodeToExecute);
+    }
+  });
+  
+
 }
 
 // Function to remove the panel
 function removePanel() {
-  const host = document.getElementById('your-extension-root');
+  const host = document.getElementById('airbender-root');
   if (host) host.remove();
 }
 
@@ -363,6 +390,24 @@ function getCleanURL() {
   }
   return cleanURL;
 }
+
+async function fetchSavedCommands() {
+  const cleanURL = getCleanURL();
+  const response = await fetch(`${API_URL}/api/getCommands`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ url: cleanURL }),
+  });
+
+  if (response.ok) {
+    return await response.json();
+  } else {
+    throw new Error("Failed to fetch commands");
+  }
+}
+
 
 
 
