@@ -6,8 +6,7 @@
     "128": "icon128.png"
   },
   "description": "With Airbender you can modify any website with just a prompt — No engineering skills required!",
-  "permissions": ["tabs", "activeTab", "scripting"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": ["activeTab"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
