@@ -1,14 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import OpenAI from 'openai';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+// import fs from 'fs';
+// import { fileURLToPath } from 'url';
+// import path from 'path';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// ...rest of your code
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 
 const app = express();
@@ -26,7 +24,7 @@ app.use(cors());
 
 app.use(express.json({ limit: '10mb' })); // Set the payload limit to 10mb
 
-app.use('/public', express.static(path.join(__dirname, 'public')));
+//app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.post('/process-input', async (req, res) => {
   const MODEL = "gpt-3.5-turbo-16k";
@@ -53,16 +51,16 @@ app.post('/process-input', async (req, res) => {
 
     const extractedCode = extractJSCodeFromResult(response.choices[0].message.content.trim()); //null if no code
 
-    if (extractedCode) {
-      // Save the extracted code to a file
-      const filePath = path.join(__dirname, 'public', 'wrenchCode.js');
-      fs.writeFile(filePath, extractedCode, (err) => {
-        if (err) {
-          console.error("File write failed:", err);
-          return res.status(500).json({error: 'Internal Server Error'});
-        }
-      });
-    }
+    // if (extractedCode) {
+    //   // Save the extracted code to a file
+    //   const filePath = path.join(__dirname, 'public', 'wrenchCode.js');
+    //   fs.writeFile(filePath, extractedCode, (err) => {
+    //     if (err) {
+    //       console.error("File write failed:", err);
+    //       return res.status(500).json({error: 'Internal Server Error'});
+    //     }
+    //   });
+    // }
 
     res.json({
       command: extractedCode,
