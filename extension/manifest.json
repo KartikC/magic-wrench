@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Magic Wrench Factory",
+  "name": "Airbender - bend any site to your will",
   "version": "0.1",
   "icons": {
     "128": "icon128.png"
   },
-  "description": "Use OpenAI to create wrenches (bookmarklets) that can modify any website!",
+  "description": "With Airbender you can modify any website with just a prompt — No engineering skills required!",
   "permissions": ["tabs", "activeTab", "scripting"],
   "host_permissions": ["<all_urls>"],
   "content_scripts": [

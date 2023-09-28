@@ -1,5 +1,5 @@
 //CONFIG
-const ENV = "development"; // Change to "production" when deploying
+const ENV = "production"; // Change to "production" when deploying
 
 const config = {
   development: {
