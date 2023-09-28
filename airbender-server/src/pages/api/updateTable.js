@@ -1,6 +1,28 @@
+import Cors from 'cors';
 import { sql } from "@vercel/postgres";
 
+// Initialize CORS middleware
+const cors = Cors({
+  methods: ['POST'],
+  origin: '*'
+});
+
+// Helper method to run middleware
+const runMiddleware = async (req, res, fn) => {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+};
+
 export default async function handler(req, res) {
+  // Run CORS middleware
+  await runMiddleware(req, res, cors);
+
   if (req.method !== 'POST') {
     return res.status(405).end();
   }

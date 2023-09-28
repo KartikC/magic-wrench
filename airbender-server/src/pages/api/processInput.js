@@ -30,14 +30,15 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     const userInput = req.body.userInput;
-    const domInfo = truncateJsonByTokens(req.body.domInfo, 16000);
+    const domInfo = truncateJsonByTokens(req.body.domInfo, 14000);
 
     const prompt = `Understand what the user wants and translate the following user command into JavaScript code that could be executed on an existing website: ${userInput}. Consider the following DOM info: ${domInfo.truncatedText}. Always apply important tags and use other methods to make sure your code is applied despite code that is already on the website we're modifying. Start the code block with \`\`\`javascript and end it with \`\`\``;
     console.log(prompt);
+    console.log(`Truncated? ${domInfo.didTruncate}`);
 
     try {
       const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-3.5-turbo-16k',
         messages: [
           {
             role: 'user',
@@ -50,6 +51,7 @@ export default async function handler(req, res) {
 
       res.json({
         command: extractedCode,
+        finalPrompt: prompt,
       });
     } catch (err) {
       console.error('OpenAI API call failed:', err);

@@ -11,25 +11,30 @@ export function extractJSCodeFromResult(result) {
     }
   }
   
-  export function truncateJsonByTokens(input, maxTokens) {
-    const text = JSON.stringify(input);
-    const charLimit = maxTokens * 4;
-    
-    let truncatedText = text;
-    let didTruncate = false;
+export function truncateJsonByTokens(input, maxTokens) {
+  const text = JSON.stringify(input);
+  const charLimit = maxTokens * 2;
   
-    if (text.length > charLimit) {
-      didTruncate = true;
-      truncatedText = text.substring(0, charLimit);
-      const lastComma = truncatedText.lastIndexOf(',');
-      if (lastComma > 0) {
-        truncatedText = truncatedText.substring(0, lastComma) + '}';
-      }
+  let truncatedText = text;
+  let didTruncate = false;
+
+  console.log("================");
+  console.log([text.length, charLimit]);
+  console.log("================");
+
+
+  if (text.length > charLimit) {
+    didTruncate = true;
+    truncatedText = text.substring(0, charLimit);
+    const lastComma = truncatedText.lastIndexOf(',');
+    if (lastComma > 0) {
+      truncatedText = truncatedText.substring(0, lastComma) + '}';
     }
-  
-    return {
-      truncatedText,
-      didTruncate
-    };
   }
+
+  return {
+    truncatedText,
+    didTruncate
+  };
+}
   

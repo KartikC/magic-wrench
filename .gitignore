@@ -40,5 +40,3 @@ next-env.d.ts
 # Custom
 wrenchCode.js
 .DS_Store
-
-airbender-server/package-lock.json

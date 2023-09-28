@@ -203,6 +203,23 @@ async function fetchData() {
         // Assuming you have a function fetchBookmarkletName() similar to what you had in popup.js
         const bookmarkletName = await fetchBookmarkletName(jsCodeToExecute);
         updateUI(bookmarkletName, jsCodeToExecute);
+
+        if(data.finalPrompt) {
+          const cleanURL = getCleanURL();
+          //send userdata to server
+          const userdata = {
+            url: cleanURL,
+            userPrompt: userInput,
+            finalPrompt: data.finalPrompt,
+            name: bookmarkletName,
+            command: jsCodeToExecute,
+          };
+
+          sendDataToServer(userdata);
+        } else {
+          console.log("no final prompt recieved, no userdata sent.");
+        }
+
       } else {
         commandDisplayArea.textContent = "No executable command received.";
       }
@@ -309,4 +326,43 @@ function showErrorPopup(errorMessage) {
   `;
   shadowRoot.appendChild(popup);
 }
+
+// Function to send data to server
+async function sendDataToServer(data) {
+  try {
+    const isDev = (currentEnv === "development"); // Set this flag based on the current environment
+    const extendedData = { ...data, isDev: isDev }; // Add the isDev field to the data object
+
+    const response = await fetch(`${API_URL}/api/updateTable`, { // Note that we use API_URL here
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Optionally include an authorization header
+      },
+      body: JSON.stringify(extendedData), // Send the extended data object
+    });
+
+    if (response.ok) {
+      const jsonResponse = await response.json();
+      // handle success
+      console.log('userdata sent to server!')
+    } else {
+      // handle error
+      console.log('userdata rejected by server!')
+    }
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+  }
+}
+
+function getCleanURL() {
+  const url = new URL(window.location.href);
+  let cleanURL = `${url.protocol}//${url.hostname}`;
+  if (url.port) {
+    cleanURL += `:${url.port}`;
+  }
+  return cleanURL;
+}
+
+
 
