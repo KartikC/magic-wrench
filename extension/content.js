@@ -35,6 +35,7 @@ function addPanel() {
       font-family: 'Arial', sans-serif;
       padding: 20px;
       width: 250px;
+      overflow-y: scroll !important;
       position: fixed;
       top: 0;
       right: 0;
@@ -73,15 +74,20 @@ function addPanel() {
     a:hover {
       color: #63a4ff;
     }
+    p {
+      font-size: 14px;
+    }
     #commandDisplayArea {
       white-space: pre-wrap !important;  /* Allows text to wrap */
       font-family: 'Courier New', monospace !important; /* Monospace font */
-      font-size: 10px;  /* Smaller font size */
+      font-size: 12px;  /* Smaller font size */
       word-break: break-all;  /* To prevent overflow */
       overflow-wrap: break-word;  /* Allows text to wrap onto the next line */
       max-width: 100%;  /* Maximum width */
+      max-height: 100px;
       border: 1px solid #555;  /* Optional: for visual distinction */
       padding: 10px;  /* Optional: for padding */
+      overflow-y: scroll !important;
     }
   </style>
 `;
@@ -170,10 +176,12 @@ async function fetchData() {
       
     } else {
       console.log('Server returned an error.');
+      showErrorPopup(`Server returned an error: ${await response.text()}`);
     }
 
   } catch (error) {
     console.error('Failed to communicate with the server:', error);
+    showErrorPopup(`Failed to communicate with the server: ${error}`);
   }
 }
 
@@ -240,6 +248,12 @@ async function fetchBookmarkletName(code) {
 }
 
 function updateUI(bookmarkletName, jsCodeToExecute) {
+  // Remove existing error popup if any
+  const existingErrorPopup = shadowRoot.getElementById('error-popup');
+  if (existingErrorPopup) {
+    existingErrorPopup.remove();
+  }
+
   const commandDisplayArea = shadowRoot.getElementById("commandDisplayArea");
   commandDisplayArea.textContent = `${jsCodeToExecute}`;
 
@@ -251,3 +265,15 @@ function updateUI(bookmarkletName, jsCodeToExecute) {
   shadowRoot.getElementById('bookmarkletContainer').style.display = "block";
   shadowRoot.getElementById('commandContainer').style.display = "block";
 }
+
+function showErrorPopup(errorMessage) {
+  const popup = document.createElement('div');
+  popup.id = 'error-popup';
+  popup.innerHTML = `
+    <div style="background-color: red; color: white; padding: 20px; position: fixed; bottom: 0; right: 0; z-index: 10000;">
+      Error: ${errorMessage}
+    </div>
+  `;
+  shadowRoot.appendChild(popup);
+}
+
