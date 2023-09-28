@@ -42,11 +42,15 @@ async function addPanel() {
   // Styles for the shadow root, targeting specific classes or IDs
   const style = `
   <style>
+    div:not(#loader) {
+      padding-top: 3px;
+      padding-bottom: 3px;
+    }
     .container {
       background-color: #2e2e2e;
       color: #fff;
       font-family: 'Arial', sans-serif;
-      padding: 20px;
+      padding: 20px !important;
       width: 250px;
       position: fixed;
       top: 0;
@@ -108,17 +112,20 @@ async function addPanel() {
       overflow-y: scroll !important;
     }
     #loader {
-      border: 2.5px solid #f3f3f3; /* Light grey */
-      border-top: 2.5px solid #3498db; /* Blue */
-      border-radius: 50%;
-      width: 20px;  /* Half the size */
-      height: 20px;  /* Half the size */
-      animation: spin 1s linear infinite;
-      display: none; /* Hidden by default */
-    }    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      margin-top: 12px;
+      height: 30px;
+      width: 100%;
+      background: linear-gradient(90deg, #A9A9A9 25%, #1e90ff 50%, #A9A9A9 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s linear infinite;
+    }
+    @keyframes loading {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
     }
     #commandNamesListContainer {
       font-family: 'Arial', sans-serif;
@@ -189,7 +196,6 @@ async function addPanel() {
         <a id="bookmarkletLink" href="#">Turn Wrench</a>
         <p id="importantMsg"><b>If it didn't work</b>, please click & drag the button to your bookmarks bar and click it there.</p>
       </div>
-      <div id="loader" style="display: none;"></div>
       <div id="savedCommandsList">
       <p>Community Commands:</p>
         <div id="commandNamesListContainer" style="display: none;">
@@ -197,10 +203,11 @@ async function addPanel() {
         </div>
       </div>
       <div>
-      <label for="devModeToggle">
-        <input type="checkbox" id="devModeToggle"> Enable Dev Mode
-      </label>
+        <label for="devModeToggle">
+          <input type="checkbox" id="devModeToggle"> Enable Dev Mode
+        </label>
       </div>
+      <div id="loader" style="display: none;"></div>
     </div>
   `;
   
