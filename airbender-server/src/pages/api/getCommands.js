@@ -41,8 +41,12 @@ export default async function handler(req, res) {
       return;
     }
 
+    console.log("Results:", results);
+
     // Map over results to get just the names and code
-    const commandNames = results.map(row => ({ name: row.name, code: row.command }));
+    //const commandNames = results.map(row => ({ name: row.name, code: row.command }));
+    const commandNames = results.rows.map(row => ({ name: row.name, code: row.command }));
+
 
     res.status(200).json(commandNames);
   } catch (error) {
