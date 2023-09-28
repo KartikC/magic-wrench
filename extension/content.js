@@ -169,13 +169,13 @@ async function addPanel() {
 
   try {
     const savedCommands = await fetchSavedCommands();
-    console.log('Saved Commands:', savedCommands); // here
+    console.log('Saved Commands:', savedCommands); // remove
     const commandNamesList = shadowRoot.getElementById("commandNamesList");
     savedCommands.forEach(command => {
-      console.log('Individual Command:', command); // here
+      console.log('Individual Command:', command); // remove
       const listItem = document.createElement('li');
       listItem.textContent = command.name;
-      listItem.dataset.code = command.jsCodeToExecute;  // Store the code in the dataset but don't display it
+      listItem.dataset.code = command.code;  // Store the code in the dataset but don't display it
       commandNamesList.appendChild(listItem);
     });
     shadowRoot.getElementById("savedCommandsList").style.display = "block";
