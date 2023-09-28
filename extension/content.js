@@ -48,7 +48,6 @@ async function addPanel() {
       font-family: 'Arial', sans-serif;
       padding: 20px;
       width: 250px;
-      overflow-y: scroll !important;
       position: fixed;
       top: 0;
       right: 0;
@@ -113,14 +112,11 @@ async function addPanel() {
   const container = document.createElement('div');
   container.innerHTML = `
     <div class="container">
-    <label for="devModeToggle">
-    <input type="checkbox" id="devModeToggle"> Enable Dev Mode
-  </label>
       <textarea id="userInput" placeholder="Describe what you want to change on this site and then click the button to make it happen!"></textarea>
       <button id="generate">Generate Command</button>
       <div id="commandContainer" style="display:none;">
         <p>Received Command: </p>
-        <div id="commandDisplayArea">
+        <div id="commandDisplayArea"></div>
       </div>
       <div id="bookmarkletContainer" style="display:none;">
         <p>Click the link below to apply your changes:</p>
@@ -132,6 +128,9 @@ async function addPanel() {
           <ul id="commandNamesList">
           </ul>
       </div>
+      <label for="devModeToggle">
+        <input type="checkbox" id="devModeToggle"> Enable Dev Mode
+      </label>
     </div>
   `;
   
@@ -168,11 +167,12 @@ async function addPanel() {
     API_URL = config[currentEnv].apiUrl;
   });
 
-  const commandNamesList = shadowRoot.getElementById("commandNamesList");
-
   try {
     const savedCommands = await fetchSavedCommands();
+    console.log('Saved Commands:', savedCommands); // here
+    const commandNamesList = shadowRoot.getElementById("commandNamesList");
     savedCommands.forEach(command => {
+      console.log('Individual Command:', command); // here
       const listItem = document.createElement('li');
       listItem.textContent = command.name;
       listItem.dataset.code = command.jsCodeToExecute;  // Store the code in the dataset but don't display it
@@ -183,6 +183,7 @@ async function addPanel() {
     console.error("Failed to fetch saved commands:", error);
   }
 
+  const commandNamesList = shadowRoot.getElementById("commandNamesList");
   commandNamesList.addEventListener("click", function(event) {
     if (event.target.tagName === 'LI') {
       jsCodeToExecute = event.target.dataset.code;
