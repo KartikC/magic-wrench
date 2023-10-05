@@ -8,8 +8,11 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 // Initializing CORS middleware
 const cors = Cors({
   methods: ['POST'],
-  origin: '*'
+  origin: '*',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 });
+
 
 
 // Helper method to run middleware

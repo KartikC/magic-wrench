@@ -3,9 +3,12 @@ import { sql } from "@vercel/postgres";
 
 // Initializing CORS middleware
 const cors = Cors({
-    methods: ['POST'],
-    origin: '*'
+  methods: ['POST'],
+  origin: '*',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 });
+
 
 // Helper method to run middleware
 const runMiddleware = async (req, res, fn) => {

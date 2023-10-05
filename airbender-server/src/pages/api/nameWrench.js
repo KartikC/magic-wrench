@@ -4,8 +4,11 @@ import OpenAI from 'openai';
 // Initialize CORS middleware for all domains
 const cors = Cors({
   methods: ['POST'],
-  origin: '*'
+  origin: '*',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 });
+
 
 // Helper method to run middleware
 const runMiddleware = async (req, res, fn) => {
